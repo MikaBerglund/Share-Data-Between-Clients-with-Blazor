@@ -20,9 +20,23 @@ namespace TimerApp.Pages
         /// </summary>
         private static int SharedTotalSeconds { get; set; }
 
+        /// <summary>
+        /// The internal timer that takes care of updating the timer value.
+        /// </summary>
+        private static System.Threading.Timer InternalTimer = new System.Threading.Timer((state) => {
+            // Increment the shared count, and signal the change to all other instances
+            // of this class using the static OnTimerChanged event.
+            SharedTotalSeconds++;
+            if (null != OnTimerChanged)
+            {
+                OnTimerChanged.Invoke(null, new TimerEventArgs(SharedTotalSeconds));
+            }
+        });
+
+
+
         [Parameter]
         public string DisplayValue { get; set; }
-
 
 
         public Task StartAsync()
@@ -37,15 +51,6 @@ namespace TimerApp.Pages
             return Task.CompletedTask;
         }
 
-        private static System.Threading.Timer InternalTimer = new System.Threading.Timer((state) => {
-            // Increment the shared count, and signal the change to all other instances
-            // of this class using the static OnTimerChanged event.
-            SharedTotalSeconds++;
-            if (null != OnTimerChanged)
-            {
-                OnTimerChanged.Invoke(null, new TimerEventArgs(SharedTotalSeconds));
-            }
-        });
 
         protected override Task OnInitializedAsync()
         {
