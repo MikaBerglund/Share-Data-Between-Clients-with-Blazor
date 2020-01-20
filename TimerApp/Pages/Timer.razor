@@ -1,0 +1,12 @@
+﻿@page "/timer"
+
+<h1>Timer</h1>
+
+<div class="jumbotron">
+    <h2 class="display-4">@this.DisplayValue</h2>
+
+    <hr />
+
+    <button type="button" class="btn btn-success" @onclick="() => { this.StartAsync(); }">Start</button>
+    <button type="button" class="btn btn-outline-danger" @onclick="() => { this.StopAsync(); }">Stop</button>
+</div>
