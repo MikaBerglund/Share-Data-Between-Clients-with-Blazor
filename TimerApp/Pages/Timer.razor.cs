@@ -27,30 +27,28 @@ namespace TimerApp.Pages
 
         public Task StartAsync()
         {
-            this.Tmr.Change(1000, 1000);
+            InternalTimer.Change(1000, 1000);
             return Task.CompletedTask;
         }
 
         public Task StopAsync()
         {
-            this.Tmr.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            InternalTimer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return Task.CompletedTask;
         }
 
-        System.Threading.Timer Tmr = null;
+        private static System.Threading.Timer InternalTimer = new System.Threading.Timer((state) => {
+            // Increment the shared count, and signal the change to all other instances
+            // of this class using the static OnTimerChanged event.
+            SharedTotalSeconds++;
+            if (null != OnTimerChanged)
+            {
+                OnTimerChanged.Invoke(null, new TimerEventArgs(SharedTotalSeconds));
+            }
+        });
 
         protected override Task OnInitializedAsync()
         {
-            this.Tmr = new System.Threading.Timer((state) => {
-                // Increment the shared count, and signal the change to all other instances
-                // of this class using the static OnTimerChanged event.
-                SharedTotalSeconds++;
-                if(null != OnTimerChanged)
-                {
-                    OnTimerChanged.Invoke(this, new TimerEventArgs(SharedTotalSeconds));
-                }
-            });
-            
             OnTimerChanged += (o, e) =>
             {
                 this.InvokeAsync(() =>
